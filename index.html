@@ -1,15 +1,4 @@
 <!DOCTYPE html>
-<html lang="en">
-
-  <head>
-    <meta charset="UTF-8">
-    <title>meno storebot</title>
-    
-
-  </head>
-    
-  <body>
-  <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -98,8 +87,8 @@
 
         .payment-methods {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
             margin-bottom: 20px;
         }
 
@@ -107,7 +96,7 @@
             background-color: var(--input-bg);
             border: 2px solid transparent;
             border-radius: 14px;
-            padding: 12px 5px;
+            padding: 12px 2px;
             text-align: center;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -129,7 +118,7 @@
         }
 
         .method-title {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 700;
             color: #fff;
         }
@@ -158,7 +147,32 @@
             font-weight: 600;
         }
 
-        /* حقول الإدخال */
+        /* أزرار الشحن السريع بالنجوم */
+        .quick-stars-wrapper {
+            display: none;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .star-preset-btn {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: #fff;
+            padding: 10px 5px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .star-preset-btn:active {
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+        }
+
+        /* حقول الإدخال المتزامنة */
         .form-group {
             margin-bottom: 15px;
         }
@@ -231,7 +245,7 @@
         <h2 class="page-title">إيداع رصيد في المحفظة</h2>
         
         <!-- اختيار طريقة الدفع -->
-        <span class="section-label">1. اختر طريقة الدفع الكاش:</span>
+        <span class="section-label">1. اختر طريقة الدفع:</span>
         <div class="payment-methods">
             <div class="method-card" onclick="selectMethod('vodafone', this)">
                 <div class="method-icon" style="background-color: #e60000;"></div>
@@ -245,29 +259,49 @@
                 <div class="method-icon" style="background-color: #ff6600;"></div>
                 <span class="method-title">أورانج كاش</span>
             </div>
+            <div class="method-card" onclick="selectMethod('stars', this)">
+                <div class="method-icon" style="background: linear-gradient(135deg, #f39c12, #f1c40f); display: flex; align-items: center; justify-content: center; font-size: 14px; color: #fff;">⭐</div>
+                <span class="method-title">تليجرام ستارز</span>
+            </div>
         </div>
 
-        <!-- صندوق التحويل الديناميكي -->
+        <!-- صندوق التحويل الديناميكي (للكاش فقط) -->
         <div class="transfer-box" id="transfer-info-box">
             <p>قم بتحويل المبلغ المطلوب أولاً إلى هذا الرقم المخصص للمحفظة:</p>
             <span class="cash-number" id="target-phone">01097841806</span>
             <button class="btn-copy" onclick="copyCashNumber()">نسخ الرقم 📋</button>
         </div>
 
-        <!-- بيانات العملية -->
-        <span class="section-label">2. بيانات عملية الإيداع:</span>
-        
-        <div class="form-group">
-            <label for="amount-input">المبلغ المراد شحنه (جنيه مصري)</label>
-            <input type="number" id="amount-input" class="input-control" placeholder="أدخل قيمة المبلغ المحول">
+        <!-- أزرار الشحن السريع بالنجوم -->
+        <div class="quick-stars-wrapper" id="quick-stars-box">
+            <button class="star-preset-btn" onclick="setQuickStars(50)">50 ⭐</button>
+            <button class="star-preset-btn" onclick="setQuickStars(100)">100 ⭐</button>
+            <button class="star-preset-btn" onclick="setQuickStars(250)">250 ⭐</button>
+            <button class="star-preset-btn" onclick="setQuickStars(500)">500 ⭐</button>
         </div>
 
-        <div class="form-group">
+        <!-- بيانات العملية -->
+        <span class="section-label">2. بيانات عملية الإيداع الحالية:</span>
+        
+        <!-- حقل الجنيه المصري (أساسي في كل الحالات) -->
+        <div class="form-group" id="egp-group">
+            <label id="amount-label" for="amount-input">المبلغ المطلوب شحنه للمحفظة (جنيه مصري)</label>
+            <input type="number" id="amount-input" class="input-control" placeholder="أدخل قيمة المبلغ بالجنيه" oninput="syncInputs('egp')">
+        </div>
+
+        <!-- حقل النجوم التفاعلي (يظهر ويختفي ديناميكياً) -->
+        <div class="form-group" id="stars-group" style="display: none;">
+            <label for="stars-input">المقابل المدفوع بنجوم تليجرام (Stars ⭐)</label>
+            <input type="number" id="stars-input" class="input-control" placeholder="أدخل عدد النجوم المطلوبة" oninput="syncInputs('stars')">
+        </div>
+
+        <!-- حقل رقم محفظة الكاش للعميل -->
+        <div class="form-group" id="sender-phone-group">
             <label for="sender-phone">رقم محفظتك الكاش (الذي قمت بالتحويل منه)</label>
             <input type="tel" id="sender-phone" class="input-control" placeholder="01xxxxxxxxx" maxlength="11">
         </div>
 
-        <button class="btn-submit-charge" onclick="processDeposit()">تأكيد وإرسال طلب الإيداع 💳</button>
+        <button class="btn-submit-charge" id="submit-btn" onclick="processDeposit()">تأكيد وإرسال طلب الإيداع 💳</button>
     </div>
 
     <script>
@@ -277,7 +311,6 @@
         let clientName = "عميل مينو ستور";
         let telegramId = "6805018221";
 
-        // جلب الآيدي والاسم تلقائياً من التليجرام وعرضهم فوراً
         if (tgApp.initDataUnsafe && tgApp.initDataUnsafe.user) {
             const client = tgApp.initDataUnsafe.user;
             clientName = client.first_name + (client.last_name ? ' ' + client.last_name : '');
@@ -290,7 +323,6 @@
             document.getElementById('user-id-txt').innerText = "ID: " + telegramId;
         }
 
-        // أرقام المحافظ المعتمدة لديك
         const systemWallets = {
             vodafone: "01097841806",
             etisalat: "01113318419",
@@ -298,14 +330,73 @@
         };
 
         let selectedProvider = "";
+        const starRate = 0.65; // ⭐ 1 نجمة = 0.65 جنيه مصري
 
         function selectMethod(provider, cardElement) {
             selectedProvider = provider;
             document.querySelectorAll('.method-card').forEach(card => card.classList.remove('selected'));
             cardElement.classList.add('selected');
             
-            document.getElementById('target-phone').innerText = systemWallets[provider];
-            document.getElementById('transfer-info-box').style.display = 'block';
+            const transferBox = document.getElementById('transfer-info-box');
+            const quickStarsBox = document.getElementById('quick-stars-box');
+            const senderPhoneGroup = document.getElementById('sender-phone-group');
+            const starsGroup = document.getElementById('stars-group');
+            const amountInput = document.getElementById('amount-input');
+            const starsInput = document.getElementById('stars-input');
+            const submitBtn = document.getElementById('submit-btn');
+
+            // تصفير القيم عند تغيير الوسيلة لإعادة الحساب النظيف
+            amountInput.value = "";
+            starsInput.value = "";
+
+            if (provider === 'stars') {
+                transferBox.style.display = 'none';
+                senderPhoneGroup.style.display = 'none';
+                quickStarsBox.style.display = 'grid';
+                starsGroup.style.display = 'block'; // إظهار خانة النجوم التفاعلية حصريةً
+                submitBtn.innerHTML = "تأكيد والدفع الفوري بالنجوم أوتوماتيك ⭐️";
+                submitBtn.style.background = "linear-gradient(90deg, #f39c12 0%, #f1c40f 100%)";
+            } else {
+                transferBox.style.display = 'block';
+                senderPhoneGroup.style.display = 'block';
+                quickStarsBox.style.display = 'none';
+                starsGroup.style.display = 'none'; // إخفاء خانة النجوم
+                document.getElementById('target-phone').innerText = systemWallets[provider];
+                submitBtn.innerHTML = "تأكيد وإرسال طلب الإيداع 💳";
+                submitBtn.style.background = "linear-gradient(90deg, var(--accent-gold) 0%, #f1c40f 100%)";
+            }
+        }
+
+        // دالة المزامنة الذكية بين الخانتين حسب رغبة العميل
+        function syncInputs(changedType) {
+            const amountInput = document.getElementById('amount-input');
+            const starsInput = document.getElementById('stars-input');
+
+            if (selectedProvider !== 'stars') return;
+
+            if (changedType === 'egp') {
+                const egpValue = parseFloat(amountInput.value) || 0;
+                if (egpValue > 0) {
+                    // يحسب كم نجمة مطلوبة (الجنيه ÷ 0.65) ويقربها لأقرب رقم صحيح
+                    starsInput.value = Math.ceil(egpValue / starRate);
+                } else {
+                    starsInput.value = "";
+                }
+            } else if (changedType === 'stars') {
+                const starsValue = parseInt(starsInput.value) || 0;
+                if (starsValue > 0) {
+                    // يحسب كم جنيه سيحصل عليه (النجوم × 0.65)
+                    amountInput.value = (starsValue * starRate).toFixed(2);
+                } else {
+                    amountInput.value = "";
+                }
+            }
+        }
+
+        // الأزرار السريعة لتعيين النجوم فوراً ومزامنة الجنيه
+        function setQuickStars(stars) {
+            document.getElementById('stars-input').value = stars;
+            syncInputs('stars');
         }
 
         function copyCashNumber() {
@@ -315,25 +406,101 @@
         }
 
         function processDeposit() {
-            const amount = document.getElementById('amount-input').value;
-            const senderNum = document.getElementById('sender-phone').value;
+            const egpAmount = document.getElementById('amount-input').value;
+            const starsCount = document.getElementById('stars-input').value;
 
-            if (!selectedProvider) { alert('برجاء اختيار طريقة الدفع الكاش أولاً.'); return; }
-            if (!amount || amount <= 0) { alert('برجاء تحديد مبلغ الشحن بشكل صحيح.'); return; }
-            if (!senderNum || senderNum.length < 11) { alert('برجاء كتابة رقم محفظتك المكون من 11 رقم للتحقق من المعاملة.'); return; }
+            if (!selectedProvider) { alert('برجاء اختيار طريقة الدفع أولاً.'); return; }
+            if (!egpAmount || egpAmount <= 0) { alert('برجاء تحديد قيمة الشحن بشكل صحيح.'); return; }
 
+            if (selectedProvider === 'stars') {
+                payWithTelegramStars(parseInt(starsCount), parseFloat(egpAmount));
+            } else {
+                const senderNum = document.getElementById('sender-phone').value;
+                if (!senderNum || senderNum.length < 11) { alert('برجاء كتابة رقم محفظتك المكون من 11 رقم للتحقق من المعاملة.'); return; }
+                processCashDeposit(egpAmount, senderNum);
+            }
+        }
+
+        // الدفع بنجوم تليجرام والتحديث الفوري
+        function payWithTelegramStars(stars, egp) {
+            const botToken = "8407166957:AAHfjzLAp2kkbgxr64pHho8nazWm8sRzB5g";
+
+            fetch(`https://api.telegram.org/bot${botToken}/createInvoiceLink`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    title: "شحن رصيد تلقائي - مينو ستور",
+                    description: `إيداع فوري بمقدار ${stars} نجمة مقابل الحصول على ${egp} جنيه رصيد بالمحفظة`,
+                    payload: `stars_auto_deposit_${telegramId}_${stars}_${egp}`, 
+                    provider_token: "", 
+                    currency: "XTR",   
+                    prices: [{ label: "شحن محفظة Meno Store", amount: stars }]
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.ok && data.result) {
+                    tgApp.openInvoice(data.result, function(status) {
+                        if (status === 'paid') {
+                            alert(`🎉 مبروك! تم دفع ${stars} نجمة بنجاح، وتم إضافة +${egp} جنيه إلى محفظتك بالبوت تلقائياً.`);
+                            sendStarsSuccessNotifications(stars, egp);
+                            tgApp.close();
+                        } else if (status === 'cancelled') {
+                            alert('❌ قمت بإلغاء عملية الدفع.');
+                        } else {
+                            alert('⚠️ فشلت المعاملة.');
+                        }
+                    });
+                } else {
+                    alert('⚠️ خطأ في تهيئة بوابة النجوم بالبوت.');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('حدث خطأ في الاتصال.');
+            });
+        }
+
+        function sendStarsSuccessNotifications(stars, egp) {
+            const botToken = "8407166957:AAHfjzLAp2kkbgxr64pHho8nazWm8sRzB5g";
+            const adminId = "8301403886";
+
+            const clientMsg = `✅ *تم شحن المحفظة تلقائياً بنجاح* \n\n` +
+                              `📥 *الكمية المدفوعة:* ${stars} نجمة ⭐️\n` +
+                              `💰 *الرصيد المضاف:* +${egp} جنيه مصري \n` +
+                              `🔄 *حالة العملية:* مكتملة ومؤكدة تلقائياً بنسبة 100% 🚀`;
+
+            const adminMsg = `🌟 *عملية شحن تلقائية بالنجوم* 🌟\n\n` +
+                             `👤 *العميل:* ${clientName} \n` +
+                             `🆔 *آيدي العميل:* \`${telegramId}\` \n` +
+                             `📥 *النجوم المستلمة:* ${stars} نجمة ⭐️\n` +
+                             `💵 *الرصيد المضاف للمحفظة:* ${egp} جنيه مصري \n\n` +
+                             `⚙️ تم خصم النجوم وإضافة الشحن في المحفظة للعميل تلقائياً بالكامل دون تدخل بشري.`;
+
+            fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: telegramId, text: clientMsg, parse_mode: 'Markdown' })
+            });
+
+            fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: adminId, text: adminMsg, parse_mode: 'Markdown' })
+            });
+        }
+
+        function processCashDeposit(amount, senderNum) {
             const botToken = "8407166957:AAHfjzLAp2kkbgxr64pHho8nazWm8sRzB5g";
             const providerNameArabic = selectedProvider === 'vodafone' ? 'فودافون كاش' : selectedProvider === 'etisalat' ? 'اتصالات كاش' : 'أورانج كاش';
-            const adminId = "8301403886"; // آيدي الإدارة الخاص بك لتلقي طلبات الشحن
+            const adminId = "8301403886";
 
-            // 1. رسالة العميل (تحت الانتظار)
             const clientMessage = `⏳ *طلب شحن رصيد قيد الانتظار* \n\n` +
                                   `💰 *المبلغ المطلوب:* ${amount} جنيه مصري \n` +
                                   `💳 *طريقة الدفع:* ${providerNameArabic} \n` +
                                   `📞 *رقمك المحول منه:* \`${senderNum}\` \n\n` +
                                   `🔄 *حالة العملية:* تحت الانتظار والمراجعة الآن. سيتم إضافة الرصيد إلى محفظتك بالبوت فور تأكيد الإيداع من قبل الإدارة!`;
 
-            // 2. رسالة الأدمن (تفاصيل الإيداع الكاملة للمراجعة)
             const adminMessage = `🔔 *إشعار طلب شحن رصيد جديد* \n\n` +
                                  `👤 *اسم العميل:* ${clientName} \n` +
                                  `🆔 *آيدي العميل (ID):* \`${telegramId}\` \n` +
@@ -342,41 +509,27 @@
                                  `📞 *رقم العميل المحوّل منه:* \`${senderNum}\` \n\n` +
                                  `⚙️ يرجى التأكد من وصول المبلغ في حسابك ثم إضافة الرصيد للعميل يدوياً أو عبر لوحة التحكم بالبوت.`;
 
-            // إرسال الرسالة الأولى للعميل
             fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    chat_id: telegramId,
-                    text: clientMessage,
-                    parse_mode: 'Markdown'
-                })
+                body: JSON.stringify({ chat_id: telegramId, text: clientMessage, parse_mode: 'Markdown' })
             })
             .then(() => {
-                // إرسال الرسالة الثانية لك كأدمن فوراً
                 return fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        chat_id: adminId,
-                        text: adminMessage,
-                        parse_mode: 'Markdown'
-                    })
+                    body: JSON.stringify({ chat_id: adminId, text: adminMessage, parse_mode: 'Markdown' })
                 });
             })
             .then(() => {
                 alert('تم إرسال طلب الشحن بنجاح! طلبك الآن تحت الانتظار وتم إرسال الإشعار للإدارة.');
-                tgApp.close(); // غلق الويب آب تلقائياً للعودة للشات
+                tgApp.close();
             })
             .catch(err => {
                 console.error(err);
-                alert('حدث خطأ أثناء معالجة الطلب، يرجى المحاولة لاحقاً.');
+                alert('حدث خطأ أثناء معالجة الطلب.');
             });
         }
     </script>
 </body>
-</html>
-    
-  </body>
-  
 </html>
