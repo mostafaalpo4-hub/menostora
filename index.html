@@ -3,519 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>شحن محفظة مينو ستور - Meno Store</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-    
+    <title>منصة السلطان | بوابة الدفع</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-color: #070a13;
-            --card-bg: #0f1626;
-            --input-bg: #172237;
-            --accent-gold: #d4af37; /* الذهبي الملكي لمينو ستور */
-            --accent-gold-hover: #b8952e;
-            --text-color: #f3f4f6;
-            --border-color: #1e2d4a;
-            --gray-text: #9ca3af;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            padding: 20px 15px;
-            direction: rtl;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        /* شريط الحساب العلوي الفخم */
-        .header-profile {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: linear-gradient(135deg, #0f1626 0%, #172237 100%);
-            padding: 15px;
-            border-radius: 18px;
-            border: 1px solid var(--border-color);
-            margin-bottom: 25px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-
-        .user-section { display: flex; align-items: center; gap: 12px; }
-        .user-avatar { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--accent-gold); object-fit: cover; }
-        .user-meta { display: flex; flex-direction: column; text-align: right; }
-        .user-name { font-size: 14px; font-weight: 700; color: #fff; }
-        .user-id { font-size: 11px; color: var(--accent-gold); font-weight: bold; margin-top: 2px; }
-        
-        .brand-section { text-align: left; }
-        .brand-name { font-size: 16px; font-weight: 700; color: var(--accent-gold); letter-spacing: 0.5px; }
-        .brand-sub { font-size: 9px; color: var(--gray-text); }
-
-        /* حاوية الشحن الرئيسية */
-        .container {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 24px;
-            padding: 20px;
-            flex-grow: 1;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-        }
-
-        .page-title {
-            font-size: 18px;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 20px;
-            color: #fff;
-        }
-
-        /* طرق الدفع التفاعلية */
-        .section-label {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--gray-text);
-            margin-bottom: 10px;
-            display: block;
-        }
-
-        .payment-methods {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            margin-bottom: 20px;
-        }
-
-        .method-card {
-            background-color: var(--input-bg);
-            border: 2px solid transparent;
-            border-radius: 14px;
-            padding: 12px 2px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .method-card.selected {
-            border-color: var(--accent-gold);
-            background: linear-gradient(180deg, var(--input-bg) 0%, rgba(212, 175, 55, 0.05) 100%);
-        }
-
-        .method-icon {
-            width: 28px;
-            height: 28px;
-            border-radius: 6px;
-        }
-
-        .method-title {
-            font-size: 10px;
-            font-weight: 700;
-            color: #fff;
-        }
-
-        /* صندوق رقم الكاش المخصص للتحويل */
-        .transfer-box {
-            background: rgba(212, 175, 55, 0.03);
-            border: 1px dashed var(--accent-gold);
-            border-radius: 16px;
-            padding: 15px;
-            text-align: center;
-            margin-bottom: 20px;
-            display: none;
-        }
-
-        .transfer-box p { font-size: 12px; color: var(--gray-text); margin-bottom: 6px; }
-        .cash-number { font-size: 20px; font-weight: 700; color: var(--accent-gold); letter-spacing: 1px; display: block; margin-bottom: 8px; }
-        .btn-copy {
-            background-color: var(--input-bg);
-            color: #fff;
-            border: 1px solid var(--border-color);
-            padding: 5px 12px;
-            border-radius: 8px;
-            font-size: 11px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        /* أزرار الشحن السريع بالنجوم */
-        .quick-stars-wrapper {
-            display: none;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            margin-bottom: 15px;
-        }
-
-        .star-preset-btn {
-            background-color: var(--input-bg);
-            border: 1px solid var(--border-color);
-            color: #fff;
-            padding: 10px 5px;
-            border-radius: 10px;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.2s;
-        }
-        .star-preset-btn:active {
-            border-color: var(--accent-gold);
-            color: var(--accent-gold);
-        }
-
-        /* حقول الإدخال */
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 12px;
-            color: var(--gray-text);
-            margin-bottom: 6px;
-        }
-
-        .input-control {
-            width: 100%;
-            padding: 12px 15px;
-            background-color: var(--input-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            color: #fff;
-            font-size: 14px;
-            font-weight: 600;
-            outline: none;
-            text-align: right;
-            transition: border-color 0.2s;
-        }
-
-        .input-control:focus {
-            border-color: var(--accent-gold);
-        }
-
-        /* زر الشحن الذهبي الفخم */
-        .btn-submit-charge {
-            width: 100%;
-            background: linear-gradient(90deg, var(--accent-gold) 0%, #f1c40f 100%);
-            color: #070a13;
-            border: none;
-            padding: 14px;
-            border-radius: 14px;
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
-            margin-top: 15px;
-            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
-            transition: transform 0.1s;
-        }
-
-        .btn-submit-charge:active {
-            transform: scale(0.98);
-        }
+        body { font-family: 'Inter', sans-serif; background-color: #030712; }
+        .glass-card { background: rgba(17, 24, 39, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
     </style>
 </head>
-<body>
+<body class="text-white min-h-screen flex items-center justify-center p-4">
 
-    <div class="header-profile">
-        <div class="user-section">
-            <img id="user-pfp" src="https://via.placeholder.com/150" alt="Avatar" class="user-avatar">
-            <div class="user-meta">
-                <span id="user-name-txt" class="user-name">جاري التحميل...</span>
-                <span id="user-id-txt" class="user-id">ID: ---------</span>
-            </div>
-        </div>
-        <div class="brand-section">
-            <div class="brand-name">MENO STORE</div>
-            <div class="brand-sub">بوابة شحن الحساب الإلكترونية</div>
-        </div>
-    </div>
-
-    <div class="container">
-        <h2 class="page-title">إيداع رصيد في المحفظة</h2>
+    <div class="w-full max-w-md glass-card p-6 rounded-3xl shadow-2xl">
+        <h2 class="text-2xl font-bold mb-6 text-center text-blue-400">منصة السلطان - دفع آمن</h2>
         
-        <span class="section-label">1. اختر طريقة الدفع:</span>
-        <div class="payment-methods">
-            <div class="method-card" onclick="selectMethod('vodafone', this)">
-                <div class="method-icon" style="background-color: #e60000;"></div>
-                <span class="method-title">فودافون كاش</span>
-            </div>
-            <div class="method-card" onclick="selectMethod('etisalat', this)">
-                <div class="method-icon" style="background-color: #7ab800;"></div>
-                <span class="method-title">اتصالات كاش</span>
-            </div>
-            <div class="method-card" onclick="selectMethod('orange', this)">
-                <div class="method-icon" style="background-color: #ff6600;"></div>
-                <span class="method-title">أورانج كاش</span>
-            </div>
-            <div class="method-card" onclick="selectMethod('stars', this)">
-                <div class="method-icon" style="background: linear-gradient(135deg, #f39c12, #f1c40f); display: flex; align-items: center; justify-content: center; font-size: 14px; color: #fff;">⭐</div>
-                <span class="method-title">تليجرام ستارز</span>
+        <!-- حقل الرقم المحول له -->
+        <div class="mb-6 p-4 bg-gray-900 rounded-xl border border-gray-700">
+            <label class="block text-xs text-gray-400 mb-2">الرقم المحول له (Copy to clipboard):</label>
+            <div class="flex items-center justify-between">
+                <span id="walletNumber" class="text-xl font-mono font-bold text-white tracking-wider">01117841772</span>
+                <button onclick="copyToClipboard()" class="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded-lg text-sm transition">نسخ</button>
             </div>
         </div>
 
-        <div class="transfer-box" id="transfer-info-box">
-            <p>قم بتحويل المبلغ المطلوب أولاً إلى هذا الرقم المخصص للمحفظة:</p>
-            <span class="cash-number" id="target-phone">01097841806</span>
-            <button class="btn-copy" onclick="copyCashNumber()">نسخ الرقم 📋</button>
-        </div>
+        <form id="paymentForm" class="space-y-4">
+            <!-- طرق الدفع -->
+            <div class="grid grid-cols-2 gap-3">
+                <label class="cursor-pointer border border-gray-700 rounded-xl p-2 flex justify-center hover:border-blue-500 transition-all"><input type="radio" name="method" value="Vodafone" class="hidden" checked><img src="https://i.ibb.co/9mVrd77C/1783569777780.png" class="h-8"></label>
+                <label class="cursor-pointer border border-gray-700 rounded-xl p-2 flex justify-center hover:border-blue-500 transition-all"><input type="radio" name="method" value="Etisalat" class="hidden"><img src="https://i.ibb.co/MkQxZrcr/1783569858025.png" class="h-8"></label>
+            </div>
 
-        <div class="quick-stars-wrapper" id="quick-stars-box">
-            <button class="star-preset-btn" onclick="setQuickStars(50)">50 ⭐</button>
-            <button class="star-preset-btn" onclick="setQuickStars(100)">100 ⭐</button>
-            <button class="star-preset-btn" onclick="setQuickStars(250)">250 ⭐</button>
-            <button class="star-preset-btn" onclick="setQuickStars(500)">500 ⭐</button>
-        </div>
+            <input type="number" id="amount" placeholder="المبلغ (EGP) / Amount" class="w-full bg-gray-900 p-3 rounded-xl border border-gray-700 focus:border-blue-500 outline-none">
+            <input type="tel" id="phone" placeholder="رقم هاتفك / Your Phone" class="w-full bg-gray-900 p-3 rounded-xl border border-gray-700 focus:border-blue-500 outline-none">
+            
+            <label class="block text-sm text-gray-400">صورة التحويل / Transfer Screenshot:</label>
+            <input type="file" id="screenshot" accept="image/*" class="w-full text-sm text-gray-400 file:bg-blue-600 file:text-white file:rounded-full file:border-0 file:px-4 file:py-2 cursor-pointer">
 
-        <span class="section-label">2. بيانات عملية الإيداع الحالية:</span>
-        
-        <div class="form-group" id="egp-group">
-            <label id="amount-label" for="amount-input">المبلغ المضاف للمحفظة (جنيه مصري)</label>
-            <input type="number" id="amount-input" class="input-control" placeholder="أدخل قيمة المبلغ بالجنيه" oninput="syncInputs('egp')">
-        </div>
+            <button type="submit" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-700 py-4 rounded-xl font-bold transition-all">تأكيد الدفع / Confirm Payment</button>
+        </form>
 
-        <div class="form-group" id="stars-group" style="display: none;">
-            <label for="stars-input">المقابل المطلوب بـ نجوم تليجرام (Stars ⭐)</label>
-            <input type="number" id="stars-input" class="input-control" placeholder="أدخل عدد النجوم" oninput="syncInputs('stars')">
-        </div>
-
-        <div class="form-group" id="sender-phone-group">
-            <label for="sender-phone">رقم محفظتك الكاش (الذي قمت بالتحويل منه)</label>
-            <input type="tel" id="sender-phone" class="input-control" placeholder="01xxxxxxxxx" maxlength="11">
-        </div>
-
-        <button class="btn-submit-charge" id="submit-btn" onclick="processDeposit()">تأكيد وإرسال طلب الإيداع 💳</button>
+        <div id="statusMsg" class="hidden mt-4 text-center text-blue-400 font-medium"></div>
     </div>
 
     <script>
-        const tgApp = window.Telegram.WebApp;
-        tgApp.ready(); tgApp.expand();
-
-        let clientName = "عميل مينو ستور";
-        let telegramId = "6805018221";
-
-        if (tgApp.initDataUnsafe && tgApp.initDataUnsafe.user) {
-            const client = tgApp.initDataUnsafe.user;
-            clientName = client.first_name + (client.last_name ? ' ' + client.last_name : '');
-            telegramId = client.id;
-            document.getElementById('user-name-txt').innerText = clientName;
-            document.getElementById('user-id-txt').innerText = "ID: " + telegramId;
-            if (client.photo_url) document.getElementById('user-pfp').src = client.photo_url;
-        } else {
-            document.getElementById('user-name-txt').innerText = clientName;
-            document.getElementById('user-id-txt').innerText = "ID: " + telegramId;
+        // خاصية النسخ للرقم
+        function copyToClipboard() {
+            const text = document.getElementById('walletNumber').innerText;
+            navigator.clipboard.writeText(text);
+            alert("تم نسخ الرقم: " + text);
         }
 
-        const systemWallets = {
-            vodafone: "01097841806",
-            etisalat: "01113318419",
-            orange: "01200754498"
-        };
-
-        let selectedProvider = "";
-        const starRate = 1.00; // تم التعديل بطلبك: ⭐ 1 نجمة = 1 جنيه مصري تماماً بدون كسور
-
-        function selectMethod(provider, cardElement) {
-            selectedProvider = provider;
-            document.querySelectorAll('.method-card').forEach(card => card.classList.remove('selected'));
-            cardElement.classList.add('selected');
+        // إرسال البيانات
+        document.getElementById('paymentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            const status = document.getElementById('statusMsg');
             
-            const transferBox = document.getElementById('transfer-info-box');
-            const quickStarsBox = document.getElementById('quick-stars-box');
-            const senderPhoneGroup = document.getElementById('sender-phone-group');
-            const starsGroup = document.getElementById('stars-group');
-            const amountInput = document.getElementById('amount-input');
-            const starsInput = document.getElementById('stars-input');
-            const submitBtn = document.getElementById('submit-btn');
-
-            amountInput.value = "";
-            starsInput.value = "";
-
-            if (provider === 'stars') {
-                transferBox.style.display = 'none';
-                senderPhoneGroup.style.display = 'none';
-                quickStarsBox.style.display = 'grid';
-                starsGroup.style.display = 'block'; 
-                submitBtn.innerHTML = "تأكيد والدفع الفوري بالنجوم أوتوماتيك ⭐️";
-                submitBtn.style.background = "linear-gradient(90deg, #f39c12 0%, #f1c40f 100%)";
-            } else {
-                transferBox.style.display = 'block';
-                senderPhoneGroup.style.display = 'block';
-                quickStarsBox.style.display = 'none';
-                starsGroup.style.display = 'none'; 
-                document.getElementById('target-phone').innerText = systemWallets[provider];
-                submitBtn.innerHTML = "تأكيد وإرسال طلب الإيداع 💳";
-                submitBtn.style.background = "linear-gradient(90deg, var(--accent-gold) 0%, #f1c40f 100%)";
-            }
-        }
-
-        // دالة المزامنة والحاسبة اللحظية (أصبحت 1 إلى 1)
-        function syncInputs(changedType) {
-            const amountInput = document.getElementById('amount-input');
-            const starsInput = document.getElementById('stars-input');
-
-            if (selectedProvider !== 'stars') return;
-
-            if (changedType === 'egp') {
-                const egpValue = parseFloat(amountInput.value) || 0;
-                if (egpValue > 0) {
-                    starsInput.value = egpValue; // 1 جنيه = 1 نجمة
-                } else {
-                    starsInput.value = "";
-                }
-            } else if (changedType === 'stars') {
-                const starsValue = parseInt(starsInput.value) || 0;
-                if (starsValue > 0) {
-                    amountInput.value = starsValue; // 1 نجمة = 1 جنيه
-                } else {
-                    amountInput.value = "";
-                }
-            }
-        }
-
-        function setQuickStars(stars) {
-            document.getElementById('stars-input').value = stars;
-            syncInputs('stars');
-        }
-
-        function copyCashNumber() {
-            const num = document.getElementById('target-phone').innerText;
-            navigator.clipboard.writeText(num);
-            alert('تم نسخ رقم المحفظة بنجاح: ' + num);
-        }
-
-        function processDeposit() {
-            const egpAmount = document.getElementById('amount-input').value;
-            const starsCount = document.getElementById('stars-input').value;
-
-            if (!selectedProvider) { alert('برجاء اختيار طريقة الدفع أولاً.'); return; }
-            if (!egpAmount || egpAmount <= 0) { alert('برجاء تحديد القيمة بشكل صحيح.'); return; }
-
-            if (selectedProvider === 'stars') {
-                payWithTelegramStars(parseInt(starsCount), parseFloat(egpAmount));
-            } else {
-                const senderNum = document.getElementById('sender-phone').value;
-                if (!senderNum || senderNum.length < 11) { alert('برجاء كتابة رقم محفظتك المكون من 11 رقم للتحقق من المعاملة.'); return; }
-                processCashDeposit(egpAmount, senderNum);
-            }
-        }
-
-        // الدفع بنجوم تليجرام والتحديث الفوري
-        function payWithTelegramStars(stars, egp) {
-            const botToken = "8407166957:AAHfjzLAp2kkbgxr64pHho8nazWm8sRzB5g";
-            const cleanPayload = `starsDeposit${telegramId}x${stars}`;
-
-            fetch(`https://api.telegram.org/bot${botToken}/createInvoiceLink`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    title: "شحن رصيد تلقائي - مينو ستور",
-                    description: `إيداع فوري بمقدار ${stars} نجمة مقابل الحصول على ${egp} جنيه رصيد بالمحفظة`,
-                    payload: cleanPayload, 
-                    provider_token: "", 
-                    currency: "XTR",   
-                    prices: [{ label: "شحن محفظة Meno Store", amount: parseInt(stars) }]
-                })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.ok && data.result) {
-                    tgApp.openInvoice(data.result, function(status) {
-                        if (status === 'paid') {
-                            alert(`🎉 مبروك! تم دفع ${stars} نجمة بنجاح، وتم إضافة +${egp} جنيه إلى محفظتك بالبوت تلقائياً.`);
-                            sendStarsSuccessNotifications(stars, egp);
-                            tgApp.close();
-                        } else if (status === 'cancelled') {
-                            alert('❌ قمت بإلغاء عملية الدفع.');
-                        } else {
-                            alert('⚠️ فشلت المعاملة، يرجى التحقق من رصيد النجوم بحسابك.');
-                        }
-                    });
-                } else {
-                    alert('⚠️ خطأ تليجرام: تأكد من تفعيل "Digital Goods" في BotFather للبوت.');
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                alert('حدث خطأ في الاتصال بالسيرفر.');
-            });
-        }
-
-        function sendStarsSuccessNotifications(stars, egp) {
-            const botToken = "8407166957:AAHfjzLAp2kkbgxr64pHho8nazWm8sRzB5g";
-            const adminId = "8301403886";
-
-            const clientMsg = `✅ *تم شحن المحفظة تلقائياً بنجاح* \n\n` +
-                              `📥 *الكمية المدفوعة:* ${stars} نجمة ⭐️\n` +
-                              `💰 *الرصيد المضاف:* +${egp} جنيه مصري \n` +
-                              `🔄 *حالة العملية:* مكتملة ومؤكدة تلقائياً بنسبة 100% 🚀`;
-
-            const adminMsg = `🌟 *عملية شحن تلقائية بالنجوم* 🌟\n\n` +
-                             `👤 *العميل:* ${clientName} \n` +
-                             `🆔 *آيدي العميل:* \`${telegramId}\` \n` +
-                             `📥 *النجوم المستلمة:* ${stars} نجمة ⭐️\n` +
-                             `💵 *الرصيد المضاف للمحفظة:* ${egp} جنيه مصري \n\n` +
-                             `⚙️ تم خصم النجوم وإضافة الشحن في المحفظة للعميل تلقائياً بالكامل دون تدخل بشري.`;
-
-            fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ chat_id: telegramId, text: clientMsg, parse_mode: 'Markdown' })
-            });
-
-            fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ chat_id: adminId, text: adminMsg, parse_mode: 'Markdown' })
-            });
-        }
-
-        function processCashDeposit(amount, senderNum) {
-            const botToken = "8407166957:AAHfjzLAp2kkbgxr64pHho8nazWm8sRzB5g";
-            const providerNameArabic = selectedProvider === 'vodafone' ? 'فودافون كاش' : selectedProvider === 'etisalat' ? 'اتصالات كاش' : 'أورانج كاش';
-            const adminId = "8301403886";
-
-            const clientMessage = `⏳ *طلب شحن رصيد قيد الانتظار* \n\n` +
-                                  `💰 *المبلغ المطلوب:* ${amount} جنيه مصري \n` +
-                                  `💳 *طريقة الدفع:* ${providerNameArabic} \n` +
-                                  `📞 *رقمك المحول منه:* \`${senderNum}\` \n\n` +
-                                  `🔄 *حالة العملية:* تحت الانتظار والمراجعة الآن. سيتم إضافة الرصيد إلى محفظتك بالبوت فور تأكيد الإيداع من قبل الإدارة!`;
-
-            const adminMessage = `🔔 *إشعار طلب شحن رصيد جديد* \n\n` +
-                                 `👤 *اسم العميل:* ${clientName} \n` +
-                                 `🆔 *آيدي العميل (ID):* \`${telegramId}\` \n` +
-                                 `💰 *المبلغ المحوّل:* ${amount} جنيه مصري \n` +
-                                 `💳 *بوابة الدفع:* ${providerNameArabic} \n` +
-                                 `📞 *رقم العميل المحوّل منه:* \`${senderNum}\` \n\n` +
-                                 `⚙️ يرجى التأكد من وصول المبلغ في حسابك ثم إضافة الرصيد للعميل يدوياً أو عبر لوحة التحكم بالبوت.`;
-
-            fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ chat_id: telegramId, text: clientMessage, parse_mode: 'Markdown' })
-            })
-            .then(() => {
-                return fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ chat_id: adminId, text: adminMessage, parse_mode: 'Markdown' })
-                });
-            })
-            .then(() => {
-                alert('تم إرسال طلب الشحن بنجاح! طلبك الآن تحت الانتظار وتم إرسال الإشعار للإدارة.');
-                tgApp.close();
-            })
-            .catch(err => {
-                console.error(err);
-                alert('حدث خطأ أثناء معالجة الطلب.');
-            });
-        }
+            btn.innerText = "جاري المعالجة / Processing...";
+            
+            // محاكاة الإرسال (يمكنك ربطه بـ Bot API)
+            setTimeout(() => {
+                status.innerHTML = "تم استلام طلبك، جاري المعالجة.<br>Request received, being processed.";
+                status.classList.remove('hidden');
+                btn.innerText = "تأكيد الدفع / Confirm Payment";
+            }, 2000);
+        });
     </script>
 </body>
 </html>
