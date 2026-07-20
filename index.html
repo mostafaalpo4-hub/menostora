@@ -32,8 +32,8 @@
                 <label class="cursor-pointer border border-gray-700 rounded-xl p-2 flex justify-center hover:border-blue-500 transition-all"><input type="radio" name="method" value="Etisalat" class="hidden"><img src="https://i.ibb.co/MkQxZrcr/1783569858025.png" class="h-8"></label>
             </div>
 
-            <input type="number" id="amount" placeholder="المبلغ (EGP) / Amount" class="w-full bg-gray-900 p-3 rounded-xl border border-gray-700 focus:border-blue-500 outline-none">
-            <input type="tel" id="phone" placeholder="رقم هاتفك / Your Phone" class="w-full bg-gray-900 p-3 rounded-xl border border-gray-700 focus:border-blue-500 outline-none">
+            <input type="number" id="amount" placeholder="المبلغ (EGP) / Amount" required class="w-full bg-gray-900 p-3 rounded-xl border border-gray-700 focus:border-blue-500 outline-none">
+            <input type="tel" id="phone" placeholder="رقم هاتفك / Your Phone" required class="w-full bg-gray-900 p-3 rounded-xl border border-gray-700 focus:border-blue-500 outline-none">
             
             <label class="block text-sm text-gray-400">صورة التحويل / Transfer Screenshot:</label>
             <input type="file" id="screenshot" accept="image/*" class="w-full text-sm text-gray-400 file:bg-blue-600 file:text-white file:rounded-full file:border-0 file:px-4 file:py-2 cursor-pointer">
@@ -45,27 +45,51 @@
     </div>
 
     <script>
-        // خاصية النسخ للرقم
+        // خاصية النسخ
         function copyToClipboard() {
             const text = document.getElementById('walletNumber').innerText;
             navigator.clipboard.writeText(text);
             alert("تم نسخ الرقم: " + text);
         }
 
-        // إرسال البيانات
+        // إرسال البيانات للبوت
         document.getElementById('paymentForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
             const status = document.getElementById('statusMsg');
             
-            btn.innerText = "جاري المعالجة / Processing...";
+            btn.innerText = "جاري الإرسال...";
+            btn.disabled = true;
+
+            const BOT_TOKEN = "8608199060:AAEUhYKVr1TgnMZzLcdAzmCShgaZZcQ1KZA";
+            const CHAT_IDS = ["8997106548", "1203957018"];
             
-            // محاكاة الإرسال (يمكنك ربطه بـ Bot API)
-            setTimeout(() => {
-                status.innerHTML = "تم استلام طلبك، جاري المعالجة.<br>Request received, being processed.";
+            const amount = document.getElementById('amount').value;
+            const phone = document.getElementById('phone').value;
+            const method = document.querySelector('input[name="method"]:checked').value;
+            
+            const message = `💰 طلب دفع جديد - منصة السلطان\n\nالمبلغ: ${amount} EGP\nرقم الهاتف: ${phone}\nطريقة الدفع: ${method}\n\nStatus: Pending / جاري المعالجة`;
+
+            try {
+                for (const id of CHAT_IDS) {
+                    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ chat_id: id, text: message })
+                    });
+                }
+                
+                status.innerHTML = "تم إرسال طلبك بنجاح، جاري المعالجة.<br>Request submitted, being processed.";
                 status.classList.remove('hidden');
+                document.getElementById('paymentForm').reset();
+            } catch (error) {
+                status.innerHTML = "حدث خطأ في الاتصال.";
+                status.classList.replace('text-blue-400', 'text-red-400');
+                status.classList.remove('hidden');
+            } finally {
                 btn.innerText = "تأكيد الدفع / Confirm Payment";
-            }, 2000);
+                btn.disabled = false;
+            }
         });
     </script>
 </body>
