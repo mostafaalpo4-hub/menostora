@@ -1,96 +1,508 @@
+
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة السلطان | بوابة الدفع</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mino Stora - Earnings Withdrawal Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #030712; }
-        .glass-card { background: rgba(17, 24, 39, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: #111827;
+            --border-color: #1f2937;
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --input-bg: #1f2937;
+            --focus-ring: rgba(99, 102, 241, 0.4);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+            position: relative;
+            overflow-x: hidden;
+            width: 100%;
+        }
+
+        body[dir="rtl"] {
+            font-family: 'Cairo', sans-serif;
+        }
+
+        /* Ambient Glow Background Effects */
+        .glow-orb {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(11, 15, 25, 0) 70%);
+            z-index: 0;
+            pointer-events: none;
+        }
+        .glow-1 { top: -80px; left: -80px; }
+        .glow-2 { bottom: -80px; right: -80px; }
+
+        /* Fixed Top Language Switcher Bar */
+        .top-bar {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+        }
+
+        body[dir="rtl"] .top-bar {
+            right: auto;
+            left: 20px;
+        }
+
+        .lang-btn {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .lang-btn:hover {
+            border-color: var(--primary-color);
+            background-color: var(--input-bg);
+        }
+
+        /* Main Container Card */
+        .portal-container {
+            position: relative;
+            z-index: 5;
+            width: 100%;
+            max-width: 440px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 30px 24px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+            margin-top: 50px;
+        }
+
+        .portal-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .portal-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 6px;
+        }
+
+        .portal-header p {
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        body[dir="rtl"] .form-label {
+            text-align: right;
+        }
+
+        /* Withdrawal Type Selection Cards */
+        .type-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .type-option {
+            background-color: var(--input-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .type-option:hover {
+            border-color: var(--text-muted);
+            color: var(--text-main);
+        }
+
+        .type-option.active {
+            border-color: var(--primary-color);
+            background-color: rgba(99, 102, 241, 0.08);
+            color: var(--text-main);
+        }
+
+        /* Input Fields */
+        .form-input {
+            width: 100%;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px 16px;
+            color: var(--text-main);
+            font-size: 15px;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        body[dir="rtl"] .form-input {
+            text-align: right;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px var(--focus-ring);
+        }
+
+        .dynamic-field {
+            display: none;
+        }
+
+        .dynamic-field.visible {
+            display: block;
+            animation: fadeIn 0.3s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Submit Button */
+        .submit-btn {
+            width: 100%;
+            background-color: var(--primary-color);
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            padding: 14px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 8px;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .submit-btn:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Simple Text Notification */
+        .notification-banner {
+            margin-top: 14px;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            text-align: center;
+            display: none;
+            background-color: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #34d399;
+        }
+
+        .notification-banner.error {
+            background-color: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #f87171;
+        }
     </style>
 </head>
-<body class="text-white min-h-screen flex items-center justify-center p-4">
+<body>
 
-    <div class="w-full max-w-md glass-card p-6 rounded-3xl shadow-2xl">
-        <h2 class="text-2xl font-bold mb-6 text-center text-blue-400">منصة السلطان - دفع آمن</h2>
-        
-        <!-- حقل الرقم المحول له -->
-        <div class="mb-6 p-4 bg-gray-900 rounded-xl border border-gray-700">
-            <label class="block text-xs text-gray-400 mb-2">الرقم المحول له (Copy to clipboard):</label>
-            <div class="flex items-center justify-between">
-                <span id="walletNumber" class="text-xl font-mono font-bold text-white tracking-wider">01117841772</span>
-                <button onclick="copyToClipboard()" class="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded-lg text-sm transition">نسخ</button>
-            </div>
+    <!-- Ambient Glow Orbs -->
+    <div class="glow-orb glow-1"></div>
+    <div class="glow-orb glow-2"></div>
+
+    <!-- Fixed Top Language Switcher Bar -->
+    <div class="top-bar">
+        <button id="langToggleBtn" class="lang-btn" onclick="toggleLanguage()">العربية</button>
+    </div>
+
+    <!-- Main Withdrawal Portal Card -->
+    <div class="portal-container">
+        <div class="portal-header">
+            <h1 id="portalTitle">Mino Stora</h1>
+            <p id="portalSubtitle">Earnings Withdrawal Portal</p>
         </div>
 
-        <form id="paymentForm" class="space-y-4">
-            <!-- طرق الدفع -->
-            <div class="grid grid-cols-2 gap-3">
-                <label class="cursor-pointer border border-gray-700 rounded-xl p-2 flex justify-center hover:border-blue-500 transition-all"><input type="radio" name="method" value="Vodafone" class="hidden" checked><img src="https://i.ibb.co/9mVrd77C/1783569777780.png" class="h-8"></label>
-                <label class="cursor-pointer border border-gray-700 rounded-xl p-2 flex justify-center hover:border-blue-500 transition-all"><input type="radio" name="method" value="Etisalat" class="hidden"><img src="https://i.ibb.co/MkQxZrcr/1783569858025.png" class="h-8"></label>
+        <form id="withdrawalForm" onsubmit="handleWithdrawal(event)">
+            <!-- Step 1: Choose Withdrawal Type -->
+            <div class="form-group">
+                <label class="form-label" id="labelType">Withdrawal Type</label>
+                <div class="type-selector">
+                    <div class="type-option active" id="typeTelegram" onclick="selectType('telegram')">
+                        <span id="textTelegramOption">Telegram Stars</span>
+                    </div>
+                    <div class="type-option" id="typeCash" onclick="selectType('cash')">
+                        <span id="textCashOption">Egyptian Cash</span>
+                    </div>
+                </div>
             </div>
 
-            <input type="number" id="amount" placeholder="المبلغ (EGP) / Amount" required class="w-full bg-gray-900 p-3 rounded-xl border border-gray-700 focus:border-blue-500 outline-none">
-            <input type="tel" id="phone" placeholder="رقم هاتفك / Your Phone" required class="w-full bg-gray-900 p-3 rounded-xl border border-gray-700 focus:border-blue-500 outline-none">
-            
-            <label class="block text-sm text-gray-400">صورة التحويل / Transfer Screenshot:</label>
-            <input type="file" id="screenshot" accept="image/*" class="w-full text-sm text-gray-400 file:bg-blue-600 file:text-white file:rounded-full file:border-0 file:px-4 file:py-2 cursor-pointer">
+            <!-- Step 2A: Telegram Stars (Username only) -->
+            <div id="telegramFieldGroup" class="form-group dynamic-field visible">
+                <label class="form-label" id="labelTelegram">Telegram Username</label>
+                <input type="text" id="telegramUsername" class="form-input" placeholder="@username" value="@">
+            </div>
 
-            <button type="submit" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-700 py-4 rounded-xl font-bold transition-all">تأكيد الدفع / Confirm Payment</button>
+            <!-- Step 2B: Egyptian Cash (Phone Number AND Telegram Username) -->
+            <div id="cashFieldGroup" class="form-group dynamic-field">
+                <div style="margin-bottom: 14px;">
+                    <label class="form-label" id="labelCashPhone">Phone Number</label>
+                    <input type="tel" id="cashPhone" class="form-input" placeholder="010XXXXXXXX">
+                </div>
+                <div>
+                    <label class="form-label" id="labelCashTelegram">Telegram Username</label>
+                    <input type="text" id="cashTelegram" class="form-input" placeholder="@username" value="@">
+                </div>
+            </div>
+
+            <!-- Step 3: Withdrawal Amount -->
+            <div class="form-group">
+                <label class="form-label" id="labelAmount">Withdrawal Amount</label>
+                <input type="number" id="withdrawalAmount" class="form-input" placeholder="Enter amount" min="1" required>
+            </div>
+
+            <!-- Step 4: Submit Button -->
+            <button type="submit" id="submitBtn" class="submit-btn">Confirm Withdrawal Request</button>
+
+            <!-- Simple Text Notification -->
+            <div id="statusNotification" class="notification-banner"></div>
         </form>
-
-        <div id="statusMsg" class="hidden mt-4 text-center text-blue-400 font-medium"></div>
     </div>
 
     <script>
-        // خاصية النسخ
-        function copyToClipboard() {
-            const text = document.getElementById('walletNumber').innerText;
-            navigator.clipboard.writeText(text);
-            alert("تم نسخ الرقم: " + text);
+        const translations = {
+            en: {
+                dir: "ltr",
+                langToggleBtnText: "العربية",
+                portalTitle: "Mino Stora",
+                portalSubtitle: "Earnings Withdrawal Portal",
+                labelType: "Withdrawal Type",
+                textTelegramOption: "Telegram Stars",
+                textCashOption: "Egyptian Cash",
+                labelTelegram: "Telegram Username",
+                telegramPlaceholder: "@username",
+                labelCashPhone: "Phone Number",
+                cashPhonePlaceholder: "010XXXXXXXX",
+                labelCashTelegram: "Telegram Username",
+                cashTelegramPlaceholder: "@username",
+                labelAmount: "Withdrawal Amount",
+                amountPlaceholder: "Enter amount",
+                submitBtn: "Confirm Withdrawal Request",
+                successText: "Withdrawal request submitted successfully.",
+                errorText: "Please fill in all required fields properly."
+            },
+            ar: {
+                dir: "rtl",
+                langToggleBtnText: "English",
+                portalTitle: "مينو ستورا",
+                portalSubtitle: "بوابة سحب الأرباح",
+                labelType: "طريقة السحب",
+                textTelegramOption: "نجوم تيليجرام",
+                textCashOption: "كاش مصري",
+                labelTelegram: "معرف تيليجرام",
+                telegramPlaceholder: "@username",
+                labelCashPhone: "رقم الهاتف",
+                cashPhonePlaceholder: "010XXXXXXXX",
+                labelCashTelegram: "معرف تيليجرام",
+                cashTelegramPlaceholder: "@username",
+                labelAmount: "مبلغ السحب",
+                amountPlaceholder: "أدخل المبلغ",
+                submitBtn: "تأكيد طلب السحب",
+                successText: "تم إرسال طلب السحب بنجاح.",
+                errorText: "يرجى تعبئة كافة الحقول المطلوبة بشكل صحيح."
+            }
+        };
+
+        function toggleLanguage() {
+            const htmlTag = document.documentElement;
+            const currentLang = htmlTag.getAttribute('lang') || 'en';
+            
+            if (currentLang === 'en') {
+                applyLanguage('ar');
+            } else {
+                applyLanguage('en');
+            }
         }
 
-        // إرسال البيانات للبوت
-        document.getElementById('paymentForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('submitBtn');
-            const status = document.getElementById('statusMsg');
-            
-            btn.innerText = "جاري الإرسال...";
-            btn.disabled = true;
+        function applyLanguage(lang) {
+            const t = translations[lang];
+            const htmlTag = document.documentElement;
 
-            const BOT_TOKEN = "8608199060:AAEUhYKVr1TgnMZzLcdAzmCShgaZZcQ1KZA";
-            const CHAT_IDS = ["8997106548", "1203957018"];
+            htmlTag.setAttribute('lang', lang);
+            htmlTag.setAttribute('dir', t.dir);
+
+            document.getElementById('langToggleBtn').innerText = t.langToggleBtnText;
+            document.getElementById('portalTitle').innerText = t.portalTitle;
+            document.getElementById('portalSubtitle').innerText = t.portalSubtitle;
+            document.getElementById('labelType').innerText = t.labelType;
+            document.getElementById('textTelegramOption').innerText = t.textTelegramOption;
+            document.getElementById('textCashOption').innerText = t.textCashOption;
+            document.getElementById('labelTelegram').innerText = t.labelTelegram;
+            document.getElementById('telegramUsername').placeholder = t.telegramPlaceholder;
+            document.getElementById('labelCashPhone').innerText = t.labelCashPhone;
+            document.getElementById('cashPhone').placeholder = t.cashPhonePlaceholder;
+            document.getElementById('labelCashTelegram').innerText = t.labelCashTelegram;
+            document.getElementById('cashTelegram').placeholder = t.cashTelegramPlaceholder;
+            document.getElementById('labelAmount').innerText = t.labelAmount;
+            document.getElementById('withdrawalAmount').placeholder = t.amountPlaceholder;
+            document.getElementById('submitBtn').innerText = t.submitBtn;
+        }
+
+        function selectType(type) {
+            const telegramCard = document.getElementById('typeTelegram');
+            const cashCard = document.getElementById('typeCash');
+            const telegramGroup = document.getElementById('telegramFieldGroup');
+            const cashGroup = document.getElementById('cashFieldGroup');
+
+            if (type === 'telegram') {
+                telegramCard.classList.add('active');
+                cashCard.classList.remove('active');
+                telegramGroup.classList.add('visible');
+                cashGroup.classList.remove('visible');
+            } else {
+                cashCard.classList.add('active');
+                telegramCard.classList.remove('active');
+                cashGroup.classList.add('visible');
+                telegramGroup.classList.remove('visible');
+            }
+        }
+
+        async function handleWithdrawal(event) {
+            event.preventDefault();
+
+            const langKey = document.documentElement.getAttribute('lang') || 'en';
+            const t = translations[langKey];
             
-            const amount = document.getElementById('amount').value;
-            const phone = document.getElementById('phone').value;
-            const method = document.querySelector('input[name="method"]:checked').value;
-            
-            const message = `💰 طلب دفع جديد - منصة السلطان\n\nالمبلغ: ${amount} EGP\nرقم الهاتف: ${phone}\nطريقة الدفع: ${method}\n\nStatus: Pending / جاري المعالجة`;
+            let contactDetail = '';
+            let typeLabel = '';
+            const activeType = document.getElementById('typeTelegram').classList.contains('active') ? 'telegram' : 'cash';
+
+            if (activeType === 'telegram') {
+                const tgUser = document.getElementById('telegramUsername').value.trim();
+                typeLabel = langKey === 'ar' ? 'نجوم تيليجرام' : 'Telegram Stars';
+                if (!tgUser || tgUser === '@') {
+                    showNotification(t.errorText, true);
+                    return;
+                }
+                contactDetail = `Telegram: ${tgUser}`;
+            } else {
+                const phone = document.getElementById('cashPhone').value.trim();
+                const tgUser = document.getElementById('cashTelegram').value.trim();
+                typeLabel = langKey === 'ar' ? 'كاش مصري' : 'Egyptian Cash';
+                if (!phone || !tgUser || tgUser === '@') {
+                    showNotification(t.errorText, true);
+                    return;
+                }
+                contactDetail = `Phone: ${phone} | Telegram: ${tgUser}`;
+            }
+
+            const amount = document.getElementById('withdrawalAmount').value.trim();
+            if (!amount) {
+                showNotification(t.errorText, true);
+                return;
+            }
+
+            const activeLangName = langKey === 'ar' ? 'Arabic (العربية)' : 'English';
+            const message = `🔔 *New Mino Stora Withdrawal Request*\n\n` +
+                            `🌐 *Language:* ${activeLangName}\n` +
+                            `💳 *Withdrawal Type:* ${typeLabel}\n` +
+                            `👤 *Contact Details:* ${contactDetail}\n` +
+                            `💰 *Requested Amount:* ${amount}\n` +
+                            `🎯 *Recipient Target:* @Sdxgj (Chat ID: 1203957018)`;
+
+            const botToken = "8925540831:AAGwpgbu4dHwImw_yoG8cUCqNpe4w3angWM";
+            const chatIds = ["1203957018", "@Sdxgj"];
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
 
             try {
-                for (const id of CHAT_IDS) {
-                    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                for (const targetId of chatIds) {
+                    const apiUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
+                    await fetch(apiUrl, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ chat_id: id, text: message })
+                        body: JSON.stringify({
+                            chat_id: targetId,
+                            text: message,
+                            parse_mode: 'Markdown'
+                        })
                     });
                 }
-                
-                status.innerHTML = "تم إرسال طلبك بنجاح، جاري المعالجة.<br>Request submitted, being processed.";
-                status.classList.remove('hidden');
-                document.getElementById('paymentForm').reset();
+
+                showNotification(t.successText, false);
+                document.getElementById('withdrawalForm').reset();
+                selectType('telegram');
+                document.getElementById('telegramUsername').value = '@';
+                document.getElementById('cashTelegram').value = '@';
+
             } catch (error) {
-                status.innerHTML = "حدث خطأ في الاتصال.";
-                status.classList.replace('text-blue-400', 'text-red-400');
-                status.classList.remove('hidden');
+                console.error("Telegram API Error:", error);
+                showNotification(langKey === 'ar' ? 'حدث خطأ أثناء إرسال الطلب. يجدر المحاولة لاحقاً.' : 'Error sending request. Please try again.', true);
             } finally {
-                btn.innerText = "تأكيد الدفع / Confirm Payment";
-                btn.disabled = false;
+                submitBtn.disabled = false;
             }
-        });
+        }
+
+        function showNotification(text, isError) {
+            const notification = document.getElementById('statusNotification');
+            notification.innerText = text;
+            notification.style.display = 'block';
+            if (isError) {
+                notification.className = 'notification-banner error';
+            } else {
+                notification.className = 'notification-banner';
+            }
+
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 5000);
+        }
     </script>
 </body>
 </html>
