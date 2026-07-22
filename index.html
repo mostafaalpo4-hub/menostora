@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
@@ -137,24 +136,35 @@
             text-align: right;
         }
 
-        /* Withdrawal Type Selection Cards */
+        /* Withdrawal Type Selection Cards (Grid of 3) */
         .type-selector {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
         }
 
         .type-option {
             background-color: var(--input-bg);
             border: 2px solid var(--border-color);
             border-radius: 12px;
-            padding: 12px 10px;
+            padding: 10px 6px;
             text-align: center;
             cursor: pointer;
             transition: var(--transition);
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .type-option img {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+            border-radius: 4px;
         }
 
         .type-option:hover {
@@ -250,7 +260,7 @@
         }
     </style>
 </head>
-<body>
+<body lang="en" dir="ltr">
 
     <!-- Ambient Glow Orbs -->
     <div class="glow-orb glow-1"></div>
@@ -274,25 +284,31 @@
                 <label class="form-label" id="labelType">Withdrawal Type</label>
                 <div class="type-selector">
                     <div class="type-option active" id="typeTelegram" onclick="selectType('telegram')">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.03-2.01 1.28-5.68 3.77-.54.37-1.03.55-1.47.54-.48-.01-1.4-.27-2.08-.49-.84-.27-1.51-.42-1.45-.89.03-.25.38-.51 1.08-.78 4.23-1.84 7.05-3.05 8.46-3.64 4.03-1.69 4.87-1.98 5.41-1.99.12 0 .39.03.57.18.15.12.19.28.21.4-.02.07-.02.2-.04.37z"/></svg>
                         <span id="textTelegramOption">Telegram Stars</span>
                     </div>
                     <div class="type-option" id="typeCash" onclick="selectType('cash')">
+                        <img src="https://i.ibb.co/9mVrd77C/1783569777780.png" alt="Vodafone">
                         <span id="textCashOption">Egyptian Cash</span>
+                    </div>
+                    <div class="type-option" id="typeTon" onclick="selectType('ton')">
+                        <img src="https://i.ibb.co/spL7PLKb/1784694766692.png" alt="TON">
+                        <span id="textTonOption">TON Payment</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Step 2A: Telegram Stars (Username only) -->
+            <!-- Step 2A: Telegram Stars (Username + Min 50) -->
             <div id="telegramFieldGroup" class="form-group dynamic-field visible">
-                <label class="form-label" id="labelTelegram">Telegram Username</label>
+                <label class="form-label" id="labelTelegram">Telegram Username (Min. 50 Stars)</label>
                 <input type="text" id="telegramUsername" class="form-input" placeholder="@username" value="@">
             </div>
 
-            <!-- Step 2B: Egyptian Cash (Phone Number AND Telegram Username) -->
+            <!-- Step 2B: Egyptian Cash (Wallet Number + Telegram Username + Min 50 EGP) -->
             <div id="cashFieldGroup" class="form-group dynamic-field">
                 <div style="margin-bottom: 14px;">
-                    <label class="form-label" id="labelCashPhone">Phone Number</label>
-                    <input type="tel" id="cashPhone" class="form-input" placeholder="010XXXXXXXX">
+                    <label class="form-label" id="labelCashWallet">Wallet Number (Min. 50 EGP)</label>
+                    <input type="tel" id="cashWallet" class="form-input" placeholder="010XXXXXXXX">
                 </div>
                 <div>
                     <label class="form-label" id="labelCashTelegram">Telegram Username</label>
@@ -300,10 +316,22 @@
                 </div>
             </div>
 
+            <!-- Step 2C: TON Payment (Telegram Username + Wallet Address + Min 1 TON) -->
+            <div id="tonFieldGroup" class="form-group dynamic-field">
+                <div style="margin-bottom: 14px;">
+                    <label class="form-label" id="labelTonTelegram">Telegram Username</label>
+                    <input type="text" id="tonTelegram" class="form-input" placeholder="@username" value="@">
+                </div>
+                <div>
+                    <label class="form-label" id="labelTonWallet">TON Wallet Address</label>
+                    <input type="text" id="tonWallet" class="form-input" placeholder="Enter your TON wallet address">
+                </div>
+            </div>
+
             <!-- Step 3: Withdrawal Amount -->
             <div class="form-group">
-                <label class="form-label" id="labelAmount">Withdrawal Amount</label>
-                <input type="number" id="withdrawalAmount" class="form-input" placeholder="Enter amount" min="1" required>
+                <label class="form-label" id="labelAmount">Withdrawal Amount (Min. 1 for TON, 50 for others)</label>
+                <input type="number" id="withdrawalAmount" class="form-input" placeholder="Enter amount" min="1" step="any" required>
             </div>
 
             <!-- Step 4: Submit Button -->
@@ -324,17 +352,25 @@
                 labelType: "Withdrawal Type",
                 textTelegramOption: "Telegram Stars",
                 textCashOption: "Egyptian Cash",
-                labelTelegram: "Telegram Username",
+                textTonOption: "TON Payment",
+                labelTelegram: "Telegram Username (Min. 50 Stars)",
                 telegramPlaceholder: "@username",
-                labelCashPhone: "Phone Number",
-                cashPhonePlaceholder: "010XXXXXXXX",
+                labelCashWallet: "Wallet Number (Min. 50 EGP)",
+                cashWalletPlaceholder: "010XXXXXXXX",
                 labelCashTelegram: "Telegram Username",
                 cashTelegramPlaceholder: "@username",
-                labelAmount: "Withdrawal Amount",
+                labelTonTelegram: "Telegram Username",
+                tonTelegramPlaceholder: "@username",
+                labelTonWallet: "TON Wallet Address",
+                tonWalletPlaceholder: "Enter your TON wallet address",
+                labelAmount: "Withdrawal Amount (Min. 1 for TON, 50 for others)",
                 amountPlaceholder: "Enter amount",
                 submitBtn: "Confirm Withdrawal Request",
                 successText: "Withdrawal request submitted successfully.",
-                errorText: "Please fill in all required fields properly."
+                errorTextTelegram: "Please provide a valid Telegram username and a minimum amount of 50 stars.",
+                errorTextCash: "Please provide a valid wallet number, Telegram username, and a minimum amount of 50 EGP.",
+                errorTextTon: "Please provide a valid Telegram username, TON wallet address, and a minimum amount of 1.",
+                errorGeneral: "Please fill in all required fields properly."
             },
             ar: {
                 dir: "rtl",
@@ -344,24 +380,31 @@
                 labelType: "طريقة السحب",
                 textTelegramOption: "نجوم تيليجرام",
                 textCashOption: "كاش مصري",
-                labelTelegram: "معرف تيليجرام",
+                textTonOption: "دفع TON",
+                labelTelegram: "معرف تيليجرام (الحد الأدنى 50 نجمة)",
                 telegramPlaceholder: "@username",
-                labelCashPhone: "رقم الهاتف",
-                cashPhonePlaceholder: "010XXXXXXXX",
+                labelCashWallet: "رقم المحفظة (الحد الأدنى 50 جنيه)",
+                cashWalletPlaceholder: "010XXXXXXXX",
                 labelCashTelegram: "معرف تيليجرام",
                 cashTelegramPlaceholder: "@username",
-                labelAmount: "مبلغ السحب",
+                labelTonTelegram: "معرف تيليجرام",
+                tonTelegramPlaceholder: "@username",
+                labelTonWallet: "عنوان محفظة TON",
+                tonWalletPlaceholder: "أدخل عنوان محفظة TON الخاصة بك",
+                labelAmount: "مبلغ السحب (الحد الأدنى 1 لـ TON، و50 للباقي)",
                 amountPlaceholder: "أدخل المبلغ",
                 submitBtn: "تأكيد طلب السحب",
                 successText: "تم إرسال طلب السحب بنجاح.",
-                errorText: "يرجى تعبئة كافة الحقول المطلوبة بشكل صحيح."
+                errorTextTelegram: "يرجى إدخال معرف تيليجرام صحيح ومبلغ لا يقل عن 50 نجمة.",
+                errorTextCash: "يرجى إدخال رقم محفظة ومعرف تيليجرام ومبلغ لا يقل عن 50 جنيه مصري.",
+                errorTextTon: "يرجى إدخال معرف تيليجرام وعنوان محفظة TON ومبلغ لا يقل عن 1.",
+                errorGeneral: "يرجى تعبئة كافة الحقول المطلوبة بشكل صحيح."
             }
         };
 
         function toggleLanguage() {
             const htmlTag = document.documentElement;
             const currentLang = htmlTag.getAttribute('lang') || 'en';
-            
             if (currentLang === 'en') {
                 applyLanguage('ar');
             } else {
@@ -375,6 +418,7 @@
 
             htmlTag.setAttribute('lang', lang);
             htmlTag.setAttribute('dir', t.dir);
+            document.body.setAttribute('dir', t.dir);
 
             document.getElementById('langToggleBtn').innerText = t.langToggleBtnText;
             document.getElementById('portalTitle').innerText = t.portalTitle;
@@ -382,12 +426,17 @@
             document.getElementById('labelType').innerText = t.labelType;
             document.getElementById('textTelegramOption').innerText = t.textTelegramOption;
             document.getElementById('textCashOption').innerText = t.textCashOption;
+            document.getElementById('textTonOption').innerText = t.textTonOption;
             document.getElementById('labelTelegram').innerText = t.labelTelegram;
             document.getElementById('telegramUsername').placeholder = t.telegramPlaceholder;
-            document.getElementById('labelCashPhone').innerText = t.labelCashPhone;
-            document.getElementById('cashPhone').placeholder = t.cashPhonePlaceholder;
+            document.getElementById('labelCashWallet').innerText = t.labelCashWallet;
+            document.getElementById('cashWallet').placeholder = t.cashWalletPlaceholder;
             document.getElementById('labelCashTelegram').innerText = t.labelCashTelegram;
             document.getElementById('cashTelegram').placeholder = t.cashTelegramPlaceholder;
+            document.getElementById('labelTonTelegram').innerText = t.labelTonTelegram;
+            document.getElementById('tonTelegram').placeholder = t.tonTelegramPlaceholder;
+            document.getElementById('labelTonWallet').innerText = t.labelTonWallet;
+            document.getElementById('tonWallet').placeholder = t.tonWalletPlaceholder;
             document.getElementById('labelAmount').innerText = t.labelAmount;
             document.getElementById('withdrawalAmount').placeholder = t.amountPlaceholder;
             document.getElementById('submitBtn').innerText = t.submitBtn;
@@ -396,19 +445,27 @@
         function selectType(type) {
             const telegramCard = document.getElementById('typeTelegram');
             const cashCard = document.getElementById('typeCash');
+            const tonCard = document.getElementById('typeTon');
             const telegramGroup = document.getElementById('telegramFieldGroup');
             const cashGroup = document.getElementById('cashFieldGroup');
+            const tonGroup = document.getElementById('tonFieldGroup');
+
+            telegramCard.classList.remove('active');
+            cashCard.classList.remove('active');
+            tonCard.classList.remove('active');
+            telegramGroup.classList.remove('visible');
+            cashGroup.classList.remove('visible');
+            tonGroup.classList.remove('visible');
 
             if (type === 'telegram') {
                 telegramCard.classList.add('active');
-                cashCard.classList.remove('active');
                 telegramGroup.classList.add('visible');
-                cashGroup.classList.remove('visible');
-            } else {
+            } else if (type === 'cash') {
                 cashCard.classList.add('active');
-                telegramCard.classList.remove('active');
                 cashGroup.classList.add('visible');
-                telegramGroup.classList.remove('visible');
+            } else if (type === 'ton') {
+                tonCard.classList.add('active');
+                tonGroup.classList.add('visible');
             }
         }
 
@@ -420,38 +477,50 @@
             
             let contactDetail = '';
             let typeLabel = '';
-            const activeType = document.getElementById('typeTelegram').classList.contains('active') ? 'telegram' : 'cash';
+            
+            const activeTelegram = document.getElementById('typeTelegram').classList.contains('active');
+            const activeCash = document.getElementById('typeCash').classList.contains('active');
+            const activeTon = document.getElementById('typeTon').classList.contains('active');
+            const amount = parseFloat(document.getElementById('withdrawalAmount').value);
 
-            if (activeType === 'telegram') {
+            if (isNaN(amount)) {
+                showNotification(t.errorGeneral, true);
+                return;
+            }
+
+            if (activeTelegram) {
                 const tgUser = document.getElementById('telegramUsername').value.trim();
                 typeLabel = langKey === 'ar' ? 'نجوم تيليجرام' : 'Telegram Stars';
-                if (!tgUser || tgUser === '@') {
-                    showNotification(t.errorText, true);
+                if (!tgUser || tgUser === '@' || amount < 50) {
+                    showNotification(t.errorTextTelegram, true);
                     return;
                 }
                 contactDetail = `Telegram: ${tgUser}`;
-            } else {
-                const phone = document.getElementById('cashPhone').value.trim();
+            } else if (activeCash) {
+                const wallet = document.getElementById('cashWallet').value.trim();
                 const tgUser = document.getElementById('cashTelegram').value.trim();
                 typeLabel = langKey === 'ar' ? 'كاش مصري' : 'Egyptian Cash';
-                if (!phone || !tgUser || tgUser === '@') {
-                    showNotification(t.errorText, true);
+                if (!wallet || !tgUser || tgUser === '@' || amount < 50) {
+                    showNotification(t.errorTextCash, true);
                     return;
                 }
-                contactDetail = `Phone: ${phone} | Telegram: ${tgUser}`;
-            }
-
-            const amount = document.getElementById('withdrawalAmount').value.trim();
-            if (!amount) {
-                showNotification(t.errorText, true);
-                return;
+                contactDetail = `Wallet: \`${wallet}\` | Telegram: ${tgUser}`;
+            } else if (activeTon) {
+                const tgUser = document.getElementById('tonTelegram').value.trim();
+                const tonWallet = document.getElementById('tonWallet').value.trim();
+                typeLabel = langKey === 'ar' ? 'دفع TON' : 'TON Payment';
+                if (!tgUser || tgUser === '@' || !tonWallet || amount < 1) {
+                    showNotification(t.errorTextTon, true);
+                    return;
+                }
+                contactDetail = `Telegram: ${tgUser} | Wallet Address: \`${tonWallet}\``;
             }
 
             const activeLangName = langKey === 'ar' ? 'Arabic (العربية)' : 'English';
             const message = `🔔 *New Mino Stora Withdrawal Request*\n\n` +
                             `🌐 *Language:* ${activeLangName}\n` +
                             `💳 *Withdrawal Type:* ${typeLabel}\n` +
-                            `👤 *Contact Details:* ${contactDetail}\n` +
+                            `👤 *Details:* ${contactDetail}\n` +
                             `💰 *Requested Amount:* ${amount}\n` +
                             `🎯 *Recipient Target:* @Sdxgj (Chat ID: 1203957018)`;
 
@@ -480,10 +549,11 @@
                 selectType('telegram');
                 document.getElementById('telegramUsername').value = '@';
                 document.getElementById('cashTelegram').value = '@';
+                document.getElementById('tonTelegram').value = '@';
 
             } catch (error) {
                 console.error("Telegram API Error:", error);
-                showNotification(langKey === 'ar' ? 'حدث خطأ أثناء إرسال الطلب. يجدر المحاولة لاحقاً.' : 'Error sending request. Please try again.', true);
+                showNotification(langKey === 'ar' ? 'حدث خطأ أثناء إرسال الطلب. يرجى المحاولة لاحقاً.' : 'Error sending request. Please try again.', true);
             } finally {
                 submitBtn.disabled = false;
             }
